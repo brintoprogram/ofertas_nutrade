@@ -4,6 +4,7 @@ import * as React from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import Link from "next/link";
 import {
   Users,
   Wheat,
@@ -11,6 +12,8 @@ import {
   Loader2,
   Save,
   RefreshCw,
+  UserCircle,
+  UserPlus,
 } from "lucide-react";
 
 import {
@@ -47,6 +50,7 @@ import {
 } from "@/lib/schema";
 import { buscarCotacao } from "@/actions/cotacao";
 import { salvarOferta } from "@/actions/ofertas";
+import type { UsuarioRow } from "@/lib/supabase";
 
 type SectionProps = {
   icon: React.ReactNode;
@@ -75,10 +79,11 @@ function Section({ icon, title, description, children }: SectionProps) {
   );
 }
 
-export function OfertaForm() {
+export function OfertaForm({ usuarios }: { usuarios: UsuarioRow[] }) {
   const form = useForm<OfertaFormValues>({
     resolver: zodResolver(ofertaSchema),
     defaultValues: {
+      criadoPor: undefined as unknown as string,
       nomeParent: "",
       nomeSoldTo: "",
       commodity: "",
@@ -92,6 +97,8 @@ export function OfertaForm() {
       pagamento: undefined,
     },
   });
+
+  const semUsuarios = usuarios.length === 0;
 
   const sacas = useWatch({ control: form.control, name: "quantidadeSc" });
   const commodity = useWatch({ control: form.control, name: "commodity" });
@@ -181,12 +188,70 @@ export function OfertaForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="stagger space-y-6"
       >
+        {semUsuarios && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300/50 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-sm">
+            <div className="flex items-start gap-2">
+              <UserCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                Nenhum usuário cadastrado. Cadastre ao menos um para poder
+                registrar ofertas.
+              </span>
+            </div>
+            <Link
+              href="/usuarios"
+              className="inline-flex items-center gap-1.5 rounded-full bg-amber-900 px-3 py-1.5 text-xs font-medium text-amber-50 hover:bg-amber-800"
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              Cadastrar usuário
+            </Link>
+          </div>
+        )}
+
         {/* 1. Cliente */}
         <Section
           icon={<Users className="h-4 w-4" />}
           title="Cliente"
-          description="Identificação do grupo comprador (Parent) e da entidade legal (Sold To)."
+          description="Autor do registro e identificação do grupo comprador."
         >
+          <FormField
+            control={form.control}
+            name="criadoPor"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Criado por</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value ?? ""}
+                  disabled={semUsuarios}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          semUsuarios
+                            ? "Cadastre usuários antes de criar ofertas"
+                            : "Selecione o responsável pelo registro"
+                        }
+                      />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {usuarios.map((u) => (
+                      <SelectItem key={u.id} value={u.id}>
+                        <span className="flex items-center gap-2">
+                          <span className="font-medium">{u.nome}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {u.email}
+                          </span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="nomeParent"
@@ -456,7 +521,7 @@ export function OfertaForm() {
           <Button
             type="submit"
             size="lg"
-            disabled={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting || semUsuarios}
           >
             {form.formState.isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />

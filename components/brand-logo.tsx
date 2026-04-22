@@ -1,10 +1,12 @@
+import * as React from "react";
+
 import { cn } from "@/lib/utils";
 
 /**
  * Logo oficial da Nutrade.
- * O arquivo vive em `public/nutrade-logo.svg` — substitua por um SVG
- * de maior fidelidade (ex: vetor oficial enviado pelo time de marca)
- * sem precisar mexer neste componente.
+ * Arquivo em `public/logo.png` — substitua pelo vetor oficial se disponível
+ * (basta sobrescrever o arquivo ou trocar o src abaixo) sem mexer no resto
+ * do componente.
  */
 export function BrandLogo({
   tagline = "Comercial Exportadora LTDA",
@@ -19,17 +21,17 @@ export function BrandLogo({
       <img
         src="/logo.png"
         alt="Nutrade"
-        className="h-10 w-auto select-none md:h-11"
+        className="h-16 w-auto select-none md:h-20"
         draggable={false}
       />
 
       {tagline && (
         <>
           <div
-            className="hidden h-8 w-px bg-border/80 md:block"
+            className="hidden h-12 w-px bg-border/80 md:block"
             aria-hidden
           />
-          <div className="hidden text-[10px] font-semibold uppercase leading-[1.35] tracking-[0.2em] text-muted-foreground md:block">
+          <div className="hidden text-xs font-semibold uppercase leading-[1.35] tracking-[0.2em] text-muted-foreground md:block">
             Comercial
             <br />
             Exportadora LTDA

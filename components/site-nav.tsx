@@ -9,6 +9,7 @@ import { BrandLogo } from "@/components/brand-logo";
 const links = [
   { href: "/", label: "Ofertas" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/usuarios", label: "Usuários" },
 ];
 
 export function SiteNav() {

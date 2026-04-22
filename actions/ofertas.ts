@@ -32,6 +32,7 @@ export async function salvarOferta(
   const { data: inserted, error } = await supabaseAdmin
     .from("ofertas")
     .insert({
+      criado_por: data.criadoPor,
       nome_parent: data.nomeParent,
       nome_sold_to: data.nomeSoldTo,
       commodity: data.commodity,

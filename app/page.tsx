@@ -2,8 +2,12 @@ import { ArrowRight, BarChart3, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 import { OfertaForm } from "@/components/oferta-form";
+import { listarUsuarios } from "@/actions/usuarios";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const usuarios = await listarUsuarios();
   return (
     <section className="container relative py-12 lg:py-16">
       {/* decorative grid background */}
@@ -39,7 +43,7 @@ export default function Home() {
           </div>
         </div>
 
-        <OfertaForm />
+        <OfertaForm usuarios={usuarios} />
       </div>
     </section>
   );

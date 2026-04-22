@@ -3,6 +3,9 @@ import { z } from "zod";
 export const MOEDAS = ["BRL", "USD", "USc/LB"] as const;
 
 export const ofertaSchema = z.object({
+  criadoPor: z
+    .string({ required_error: "Selecione quem está criando a oferta" })
+    .uuid({ message: "Selecione um usuário válido" }),
   nomeParent: z.string().min(1, "Informe o Nome Parent"),
   nomeSoldTo: z.string().min(1, "Informe o Nome Sold To"),
   commodity: z.string().min(1, "Selecione a commodity"),

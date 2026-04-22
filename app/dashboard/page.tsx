@@ -2,6 +2,7 @@ import { format, startOfDay, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   ArrowUpRight,
+  Download,
   FileStack,
   Layers,
   Sparkles,
@@ -151,13 +152,23 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <Link
-          href="/"
-          className="group inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow-primary transition-all hover:bg-primary-hover hover:shadow-premium-lg"
-        >
-          Nova Oferta
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/api/ofertas/export"
+            className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-4 py-2 text-sm font-medium shadow-sm transition-all hover:border-primary/40 hover:bg-white hover:shadow-premium"
+            aria-disabled={vazio}
+          >
+            <Download className="h-4 w-4 text-primary" />
+            Exportar Excel
+          </a>
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow-primary transition-all hover:bg-primary-hover hover:shadow-premium-lg"
+          >
+            Nova Oferta
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-4 stagger md:grid-cols-3">

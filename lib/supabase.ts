@@ -22,6 +22,14 @@ export const supabaseAdmin = createClient(url, serviceKey, {
   },
 });
 
+export type UsuarioRow = {
+  id: string;
+  nome: string;
+  email: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type OfertaRow = {
   id: string;
   nome_parent: string;
@@ -35,6 +43,11 @@ export type OfertaRow = {
   preco: number;
   moeda: "BRL" | "USD" | "USc/LB";
   pagamento: string;
+  criado_por: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type OfertaRowComCriador = OfertaRow & {
+  criador: Pick<UsuarioRow, "id" | "nome" | "email"> | null;
 };
