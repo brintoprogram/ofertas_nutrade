@@ -12,20 +12,16 @@ import {
   YAxis,
 } from "recharts";
 
-export type VendedorDatum = { vendedor: string; ofertas: number };
+export type ParentDatum = { parent: string; ofertas: number };
 export type DiaDatum = { data: string; ofertas: number };
 
-export function OfertasPorVendedorChart({
-  data,
-}: {
-  data: VendedorDatum[];
-}) {
+export function OfertasPorParentChart({ data }: { data: ParentDatum[] }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 24 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
         <XAxis
-          dataKey="vendedor"
+          dataKey="parent"
           tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
           interval={0}
           angle={-15}

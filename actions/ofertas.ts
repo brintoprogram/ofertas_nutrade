@@ -32,20 +32,17 @@ export async function salvarOferta(
   const { data: inserted, error } = await supabaseAdmin
     .from("ofertas")
     .insert({
-      vendedor: data.vendedor,
-      cliente_nome: data.clienteNome,
-      inscricao_estadual: data.inscricaoEstadual?.trim() || null,
+      nome_parent: data.nomeParent,
+      nome_sold_to: data.nomeSoldTo,
       commodity: data.commodity,
-      quantidade_sacas: data.quantidadeSacas,
-      quantidade_ton: data.quantidadeTon,
-      incoterm: data.incoterm,
       praca: data.praca,
-      local_embarque: data.localEmbarque,
-      data_embarque: format(data.dataEmbarque, "yyyy-MM-dd"),
-      moeda: data.moeda,
+      local_retirada_entrega: data.localRetiradaEntrega,
+      quantidade_sc: data.quantidadeSc,
+      quantidade_ton: data.quantidadeTon,
+      prazo_entrega: format(data.prazoEntrega, "yyyy-MM-dd"),
       preco: data.preco,
-      tipo_preco: data.tipoPreco,
-      data_pagamento: format(data.dataPagamento, "yyyy-MM-dd"),
+      moeda: data.moeda,
+      pagamento: format(data.pagamento, "yyyy-MM-dd"),
     })
     .select("id")
     .single();

@@ -20,9 +20,9 @@ import {
 import { supabaseAdmin, type OfertaRow } from "@/lib/supabase";
 import {
   Evolucao7DiasChart,
-  OfertasPorVendedorChart,
+  OfertasPorParentChart,
   type DiaDatum,
-  type VendedorDatum,
+  type ParentDatum,
 } from "@/components/dashboard-charts";
 import { cn } from "@/lib/utils";
 
@@ -109,16 +109,16 @@ export default async function DashboardPage() {
   const totalOfertas = ofertas.length;
   const volumeTon = ofertas.reduce((a, o) => a + Number(o.quantidade_ton), 0);
   const valorTotal = ofertas.reduce(
-    (a, o) => a + Number(o.preco) * o.quantidade_sacas,
+    (a, o) => a + Number(o.preco) * o.quantidade_sc,
     0
   );
 
-  const porVendedorMap = ofertas.reduce<Record<string, number>>((acc, o) => {
-    acc[o.vendedor] = (acc[o.vendedor] ?? 0) + 1;
+  const porParentMap = ofertas.reduce<Record<string, number>>((acc, o) => {
+    acc[o.nome_parent] = (acc[o.nome_parent] ?? 0) + 1;
     return acc;
   }, {});
-  const porVendedor: VendedorDatum[] = Object.entries(porVendedorMap)
-    .map(([vendedor, ofertasCount]) => ({ vendedor, ofertas: ofertasCount }))
+  const porParent: ParentDatum[] = Object.entries(porParentMap)
+    .map(([parent, ofertasCount]) => ({ parent, ofertas: ofertasCount }))
     .sort((a, b) => b.ofertas - a.ofertas);
 
   const hoje = startOfDay(new Date());
@@ -190,9 +190,9 @@ export default async function DashboardPage() {
           <CardHeader className="border-b border-border/60 bg-gradient-to-b from-primary-soft/40 to-transparent">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Ofertas por Vendedor</CardTitle>
+                <CardTitle>Ofertas por Parent</CardTitle>
                 <CardDescription>
-                  Produtividade por responsável
+                  Volume de ofertas por grupo comprador
                 </CardDescription>
               </div>
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -204,7 +204,7 @@ export default async function DashboardPage() {
             {vazio ? (
               <EmptyState />
             ) : (
-              <OfertasPorVendedorChart data={porVendedor} />
+              <OfertasPorParentChart data={porParent} />
             )}
           </CardContent>
         </Card>

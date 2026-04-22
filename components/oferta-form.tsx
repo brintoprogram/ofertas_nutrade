@@ -6,8 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
   Users,
-  Package,
-  Truck,
+  Wheat,
   BadgeDollarSign,
   Loader2,
   Save,
@@ -42,12 +41,11 @@ import {
 import { DatePicker } from "@/components/ui/date-picker";
 import {
   COMMODITIES,
-  INCOTERMS,
   MOEDAS,
   OfertaFormValues,
   ofertaSchema,
 } from "@/lib/schema";
-import { buscarCotacao } from "@/lib/cotacao";
+import { buscarCotacao } from "@/actions/cotacao";
 import { salvarOferta } from "@/actions/ofertas";
 
 type SectionProps = {
@@ -81,24 +79,21 @@ export function OfertaForm() {
   const form = useForm<OfertaFormValues>({
     resolver: zodResolver(ofertaSchema),
     defaultValues: {
-      vendedor: "",
-      clienteNome: "",
-      inscricaoEstadual: "",
+      nomeParent: "",
+      nomeSoldTo: "",
       commodity: "",
-      quantidadeSacas: undefined as unknown as number,
-      quantidadeTon: 0,
-      incoterm: "",
       praca: "",
-      localEmbarque: "",
-      dataEmbarque: undefined,
-      moeda: undefined,
+      localRetiradaEntrega: "",
+      quantidadeSc: undefined as unknown as number,
+      quantidadeTon: 0,
+      prazoEntrega: undefined,
       preco: undefined as unknown as number,
-      tipoPreco: "Farmer Selling",
-      dataPagamento: undefined,
+      moeda: undefined,
+      pagamento: undefined,
     },
   });
 
-  const sacas = useWatch({ control: form.control, name: "quantidadeSacas" });
+  const sacas = useWatch({ control: form.control, name: "quantidadeSc" });
   const commodity = useWatch({ control: form.control, name: "commodity" });
   const praca = useWatch({ control: form.control, name: "praca" });
 
@@ -112,20 +107,42 @@ export function OfertaForm() {
     if (!commodity || !praca) return;
     setBuscandoCotacao(true);
     try {
-      const valor = await buscarCotacao(commodity, praca);
-      form.setValue("preco", valor, {
+      const result = await buscarCotacao(commodity, praca);
+
+      if (!result.ok) {
+        toast.error("Não foi possível buscar a cotação", {
+          description: result.message,
+        });
+        return;
+      }
+
+      form.setValue("preco", result.preco, {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
       });
-      toast.success("Cotação do dia atualizada", {
-        description: `${commodity} em ${praca}: R$ ${valor.toLocaleString(
-          "pt-BR",
-          { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-        )} — você pode editar o valor.`,
+      form.setValue("moeda", result.moeda, {
+        shouldValidate: true,
+        shouldDirty: true,
       });
-    } catch {
-      toast.error("Não foi possível buscar a cotação. Tente novamente.");
+
+      const precoFmt = result.preco.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      toast.success(
+        result.exact
+          ? `Cotação encontrada: R$ ${precoFmt}/sc`
+          : `Praça exata não encontrada — referência: R$ ${precoFmt}/sc`,
+        {
+          description: `${result.matchedPraca} • ${result.source}`,
+          duration: 6000,
+        }
+      );
+    } catch (err) {
+      console.error("[buscarCotacao] erro inesperado:", err);
+      toast.error("Erro inesperado ao buscar cotação. Tente novamente.");
     } finally {
       setBuscandoCotacao(false);
     }
@@ -133,9 +150,8 @@ export function OfertaForm() {
 
   React.useEffect(() => {
     const sacasNum = Number(sacas);
-    const ton = Number.isFinite(sacasNum) && sacasNum > 0
-      ? (sacasNum * 60) / 1000
-      : 0;
+    const ton =
+      Number.isFinite(sacasNum) && sacasNum > 0 ? (sacasNum * 60) / 1000 : 0;
     form.setValue("quantidadeTon", Number(ton.toFixed(3)), {
       shouldValidate: false,
       shouldDirty: false,
@@ -153,7 +169,7 @@ export function OfertaForm() {
     }
 
     toast.success("Oferta salva com sucesso!", {
-      description: `${values.commodity} — ${values.quantidadeSacas} sacas para ${values.clienteNome}`,
+      description: `${values.commodity} — ${values.quantidadeSc} sacas para ${values.nomeSoldTo}`,
     });
 
     form.reset();
@@ -165,20 +181,20 @@ export function OfertaForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="stagger space-y-6"
       >
-        {/* 1. Dados do Cliente */}
+        {/* 1. Cliente */}
         <Section
           icon={<Users className="h-4 w-4" />}
-          title="Dados do Cliente"
-          description="Identificação do comprador e responsável pela oferta."
+          title="Cliente"
+          description="Identificação do grupo comprador (Parent) e da entidade legal (Sold To)."
         >
           <FormField
             control={form.control}
-            name="vendedor"
+            name="nomeParent"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Vendedor</FormLabel>
+                <FormLabel>Nome Parent</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nome do vendedor" {...field} />
+                  <Input placeholder="Ex: Bunge" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -186,40 +202,27 @@ export function OfertaForm() {
           />
           <FormField
             control={form.control}
-            name="clienteNome"
+            name="nomeSoldTo"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome do Cliente</FormLabel>
+                <FormLabel>Nome Sold To</FormLabel>
                 <FormControl>
-                  <Input placeholder="Razão social / Nome" {...field} />
+                  <Input
+                    placeholder="Ex: Bunge Alimentos S/A"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="inscricaoEstadual"
-            render={({ field }) => (
-              <FormItem className="md:col-span-2">
-                <FormLabel>Inscrição Estadual</FormLabel>
-                <FormControl>
-                  <Input placeholder="Opcional" {...field} />
-                </FormControl>
-                <FormDescription>
-                  Campo opcional — deixe em branco caso não se aplique.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </Section>
 
-        {/* 2. Detalhes da Carga */}
+        {/* 2. Produto & Logística */}
         <Section
-          icon={<Package className="h-4 w-4" />}
-          title="Detalhes da Carga"
-          description="Commodity e volume negociado."
+          icon={<Wheat className="h-4 w-4" />}
+          title="Produto e Logística"
+          description="Commodity, quantidade, origem e prazo de entrega."
         >
           <FormField
             control={form.control}
@@ -248,15 +251,43 @@ export function OfertaForm() {
               </FormItem>
             )}
           />
-
-          <div className="hidden md:block" aria-hidden />
+          <FormField
+            control={form.control}
+            name="praca"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Praça</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Sorriso/MT" {...field} />
+                </FormControl>
+                <FormDescription>Cidade/UF da originação.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="localRetiradaEntrega"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Local de Retirada/Entrega</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Ex: Porto de Paranaguá / Armazém XYZ"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
-            name="quantidadeSacas"
+            name="quantidadeSc"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Quantidade (sacas)</FormLabel>
+                <FormLabel>Quantidade SC</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -278,7 +309,7 @@ export function OfertaForm() {
             name="quantidadeTon"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Quantidade (toneladas)</FormLabel>
+                <FormLabel>Quantidade TON</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -289,81 +320,17 @@ export function OfertaForm() {
                   />
                 </FormControl>
                 <FormDescription>
-                  Calculado automaticamente: sacas × 60 ÷ 1000
+                  Calculado: sacas × 60 ÷ 1000
                 </FormDescription>
               </FormItem>
             )}
           />
-        </Section>
-
-        {/* 3. Logística */}
-        <Section
-          icon={<Truck className="h-4 w-4" />}
-          title="Logística"
-          description="Condições de entrega e embarque."
-        >
           <FormField
             control={form.control}
-            name="incoterm"
+            name="prazoEntrega"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Incoterm</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o Incoterm" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {INCOTERMS.map((i) => (
-                      <SelectItem key={i} value={i}>
-                        {i}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="praca"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Praça</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ex: Sorriso/MT" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="localEmbarque"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Local de Embarque</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Ex: Porto de Santos"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="dataEmbarque"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Data de Embarque</FormLabel>
+              <FormItem className="md:col-span-2">
+                <FormLabel>Prazo de Entrega</FormLabel>
                 <FormControl>
                   <DatePicker
                     value={field.value}
@@ -377,12 +344,57 @@ export function OfertaForm() {
           />
         </Section>
 
-        {/* 4. Precificação */}
+        {/* 3. Comercial */}
         <Section
           icon={<BadgeDollarSign className="h-4 w-4" />}
-          title="Precificação"
-          description="Valores, moeda e prazo de pagamento."
+          title="Comercial"
+          description="Preço, moeda e data de pagamento."
         >
+          <FormField
+            control={form.control}
+            name="preco"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>Preço</FormLabel>
+                <div className="flex gap-2">
+                  <FormControl>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      min={0}
+                      step="0.01"
+                      placeholder="0,00"
+                      className="flex-1"
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBuscarCotacao}
+                    disabled={!podeBuscarCotacao}
+                    className="shrink-0"
+                  >
+                    {buscandoCotacao ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-4 w-4" />
+                    )}
+                    <span className="hidden sm:inline">
+                      {buscandoCotacao ? "Buscando..." : "Buscar Cotação"}
+                    </span>
+                  </Button>
+                </div>
+                <FormDescription>
+                  {podeBuscarCotacao || buscandoCotacao
+                    ? "Busca cotação real do dia (Notícias Agrícolas) — você pode editar manualmente o valor retornado."
+                    : "Preencha commodity e praça para habilitar a busca de cotação."}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="moeda"
@@ -412,68 +424,10 @@ export function OfertaForm() {
           />
           <FormField
             control={form.control}
-            name="preco"
+            name="pagamento"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Preço</FormLabel>
-                <div className="flex gap-2">
-                  <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="decimal"
-                      min={0}
-                      step="0.01"
-                      placeholder="0,00"
-                      className="flex-1"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleBuscarCotacao}
-                    disabled={!podeBuscarCotacao}
-                    className="shrink-0"
-                  >
-                    {buscandoCotacao ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <RefreshCw className="h-4 w-4" />
-                    )}
-                    <span className="hidden sm:inline">
-                      Buscar Cotação do Dia
-                    </span>
-                  </Button>
-                </div>
-                <FormDescription>
-                  {podeBuscarCotacao || buscandoCotacao
-                    ? "O valor sugerido pode ser editado manualmente."
-                    : "Preencha commodity e praça para habilitar a busca de cotação."}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="tipoPreco"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tipo de Preço</FormLabel>
-                <FormControl>
-                  <Input placeholder="Farmer Selling" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="dataPagamento"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Data de Pagamento</FormLabel>
+                <FormLabel>Pagamento</FormLabel>
                 <FormControl>
                   <DatePicker
                     value={field.value}

@@ -24,20 +24,17 @@ export const supabaseAdmin = createClient(url, serviceKey, {
 
 export type OfertaRow = {
   id: string;
-  vendedor: string;
-  cliente_nome: string;
-  inscricao_estadual: string | null;
+  nome_parent: string;
+  nome_sold_to: string;
   commodity: string;
-  quantidade_sacas: number;
-  quantidade_ton: number;
-  incoterm: string;
   praca: string;
-  local_embarque: string;
-  data_embarque: string;
-  moeda: "BRL" | "USD" | "USc/LB";
+  local_retirada_entrega: string;
+  quantidade_sc: number;
+  quantidade_ton: number;
+  prazo_entrega: string;
   preco: number;
-  tipo_preco: string;
-  data_pagamento: string;
+  moeda: "BRL" | "USD" | "USc/LB";
+  pagamento: string;
   created_at: string;
   updated_at: string;
 };
