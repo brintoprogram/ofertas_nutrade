@@ -26,9 +26,7 @@ export default async function Home() {
             commodity.
           </h1>
           <p className="mt-4 max-w-2xl text-balance text-base leading-relaxed text-muted-foreground">
-            Capture cliente, logística e precificação em um único fluxo. Os
-            dados alimentam o dashboard em tempo real e ficam prontos para a
-            integração com mesa de negociação.
+            Os dados alimentam o dashboard em tempo real e ficam prontos para a integração com mesa de negociação.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
