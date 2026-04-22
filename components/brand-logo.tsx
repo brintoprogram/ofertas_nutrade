@@ -17,9 +17,9 @@ export function BrandLogo({
     <div className={cn("flex items-center gap-3", className)}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/nutrade-logo.svg"
+        src="/logo.png"
         alt="Nutrade"
-        className="h-9 w-auto select-none md:h-10"
+        className="h-10 w-auto select-none md:h-11"
         draggable={false}
       />
 
