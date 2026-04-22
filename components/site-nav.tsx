@@ -21,7 +21,7 @@ export function SiteNav() {
           href="/"
           className="group flex items-center gap-3 transition-opacity hover:opacity-90"
         >
-          <BrandLogo size="md" />
+          <BrandLogo />
         </Link>
 
         <nav className="flex items-center gap-1 rounded-full border border-border/60 bg-background/60 p-1 shadow-sm">

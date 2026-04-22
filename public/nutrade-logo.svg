@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 88" role="img" aria-label="Nutrade">
+  <title>Nutrade</title>
+  <g transform="translate(6 6) scale(0.76)">
+    <!-- outer circle -->
+    <circle cx="50" cy="50" r="46" fill="none" stroke="#1F2937" stroke-width="3.5"/>
+    <!-- cross dividers -->
+    <line x1="4" y1="50" x2="96" y2="50" stroke="#1F2937" stroke-width="3"/>
+    <line x1="50" y1="4" x2="50" y2="96" stroke="#1F2937" stroke-width="3"/>
+
+    <!-- TL: Brasil (simplificado) -->
+    <path d="M20 22 Q28 17 35 21 Q41 26 41 34 Q43 41 38 45 L28 46 Q22 43 20 36 Z"
+          fill="none" stroke="#1F2937" stroke-width="2.2" stroke-linejoin="round"/>
+
+    <!-- TR: Navio -->
+    <g fill="none" stroke="#1F2937" stroke-width="2.2" stroke-linejoin="round">
+      <rect x="62" y="20" width="26" height="14"/>
+      <line x1="66" y1="24" x2="66" y2="30"/>
+      <line x1="72" y1="24" x2="72" y2="30"/>
+      <line x1="78" y1="24" x2="78" y2="30"/>
+      <line x1="84" y1="24" x2="84" y2="30"/>
+      <path d="M56 34 L94 34 L88 44 L62 44 Z"/>
+    </g>
+
+    <!-- BL: Sol com raios / horizonte -->
+    <g fill="none" stroke="#1F2937" stroke-width="2.2" stroke-linecap="round">
+      <circle cx="30" cy="78" r="6"/>
+      <line x1="30" y1="60" x2="30" y2="67"/>
+      <line x1="14" y1="78" x2="21" y2="78"/>
+      <line x1="39" y1="78" x2="46" y2="78"/>
+      <line x1="18" y1="66" x2="22" y2="70"/>
+      <line x1="42" y1="66" x2="38" y2="70"/>
+      <line x1="18" y1="90" x2="22" y2="86"/>
+      <line x1="42" y1="90" x2="38" y2="86"/>
+    </g>
+
+    <!-- BR: Globo -->
+    <g fill="none" stroke="#1F2937" stroke-width="2.2" stroke-linejoin="round">
+      <circle cx="74" cy="74" r="14"/>
+      <path d="M60 70 Q67 66 74 69 Q80 72 88 69"/>
+      <path d="M60 78 Q67 82 74 79 Q80 76 88 79"/>
+      <line x1="74" y1="60" x2="74" y2="88"/>
+    </g>
+  </g>
+
+  <!-- Wordmark: "nu" escuro + "trade" verde -->
+  <g font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="56" letter-spacing="-1">
+    <text x="95" y="66" fill="#1F2937">nu</text>
+    <text x="158" y="66" fill="#8BC53F">trade</text>
+  </g>
+</svg>

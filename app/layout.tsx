@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Nutrade — Commodities Trading",
+  title: "Nutrade — Comercial Exportadora LTDA",
   description:
     "Plataforma de cadastro e análise de ofertas de commodities agrícolas.",
 };
