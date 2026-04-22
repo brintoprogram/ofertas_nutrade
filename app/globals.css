@@ -4,43 +4,153 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 150 20% 12%;
+    --background: 150 25% 98%;
+    --foreground: 152 30% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 150 20% 12%;
+    --card-foreground: 152 30% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 20% 12%;
+    --popover-foreground: 152 30% 10%;
 
-    --primary: 142 55% 28%;
+    --primary: 152 68% 22%;
     --primary-foreground: 0 0% 100%;
+    --primary-hover: 152 72% 18%;
+    --primary-soft: 150 45% 94%;
 
-    --secondary: 140 20% 96%;
-    --secondary-foreground: 150 20% 18%;
+    --secondary: 150 20% 96%;
+    --secondary-foreground: 152 30% 15%;
 
-    --muted: 140 15% 96%;
-    --muted-foreground: 150 8% 42%;
+    --muted: 150 15% 95%;
+    --muted-foreground: 150 10% 40%;
 
-    --accent: 140 30% 93%;
-    --accent-foreground: 150 20% 18%;
+    --accent: 150 30% 94%;
+    --accent-foreground: 152 30% 15%;
+
+    --brand-gold: 38 92% 50%;
+    --brand-gold-soft: 42 95% 94%;
+    --brand-gold-foreground: 30 90% 15%;
+
+    --success: 142 70% 36%;
+    --success-foreground: 0 0% 100%;
 
     --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 140 10% 88%;
-    --input: 140 10% 88%;
-    --ring: 142 55% 28%;
+    --border: 150 14% 90%;
+    --input: 150 14% 90%;
+    --ring: 152 68% 30%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   * {
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+  html {
+    scroll-behavior: smooth;
   }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.4) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+
+  .bg-hero {
+    background-image:
+      radial-gradient(ellipse 900px 500px at 15% -10%, hsl(var(--primary) / 0.12), transparent 60%),
+      radial-gradient(ellipse 700px 400px at 95% 0%, hsl(var(--brand-gold) / 0.08), transparent 55%),
+      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)));
+  }
+
+  .shadow-premium {
+    box-shadow:
+      0 1px 2px 0 hsl(152 30% 10% / 0.04),
+      0 4px 12px -2px hsl(152 30% 10% / 0.06),
+      0 12px 32px -8px hsl(152 30% 10% / 0.08);
+  }
+
+  .shadow-premium-lg {
+    box-shadow:
+      0 1px 2px 0 hsl(152 30% 10% / 0.05),
+      0 8px 24px -4px hsl(152 30% 10% / 0.08),
+      0 24px 48px -12px hsl(152 30% 10% / 0.12);
+  }
+
+  .shadow-glow-primary {
+    box-shadow: 0 8px 24px -8px hsl(var(--primary) / 0.45);
+  }
+
+  .ring-soft {
+    box-shadow: inset 0 0 0 1px hsl(var(--border) / 0.6);
+  }
+
+  .glass {
+    background: hsl(var(--background) / 0.72);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+  }
+
+  .gradient-text-primary {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(152 60% 38%) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+@layer components {
+  .fade-up {
+    animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .fade-in {
+    animation: fade-in 0.4s ease-out both;
+  }
+  .stagger > * {
+    opacity: 0;
+    animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 40ms; }
+  .stagger > *:nth-child(2) { animation-delay: 120ms; }
+  .stagger > *:nth-child(3) { animation-delay: 200ms; }
+  .stagger > *:nth-child(4) { animation-delay: 280ms; }
+  .stagger > *:nth-child(5) { animation-delay: 360ms; }
+  .stagger > *:nth-child(6) { animation-delay: 440ms; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
 }

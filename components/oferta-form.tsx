@@ -59,17 +59,20 @@ type SectionProps = {
 
 function Section({ icon, title, description, children }: SectionProps) {
   return (
-    <Card className="border-border/70">
-      <CardHeader className="flex flex-row items-start gap-3 space-y-0 pb-4">
-        <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary">
-          {icon}
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-premium-lg">
+      <CardHeader className="flex flex-row items-start gap-4 space-y-0 border-b border-border/50 bg-gradient-to-b from-primary-soft/40 to-transparent pb-5">
+        <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-hover text-primary-foreground shadow-glow-primary ring-1 ring-white/10">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-xl bg-gradient-to-b from-white/15 to-transparent" />
+          <div className="relative">{icon}</div>
         </div>
-        <div className="space-y-1">
-          <CardTitle>{title}</CardTitle>
+        <div className="space-y-1 pt-0.5">
+          <CardTitle className="text-[15px]">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="grid gap-5 md:grid-cols-2">{children}</CardContent>
+      <CardContent className="grid gap-5 pt-6 md:grid-cols-2">
+        {children}
+      </CardContent>
     </Card>
   );
 }
@@ -158,7 +161,10 @@ export function OfertaForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="stagger space-y-6"
+      >
         {/* 1. Dados do Cliente */}
         <Section
           icon={<Users className="h-4 w-4" />}
@@ -481,7 +487,10 @@ export function OfertaForm() {
           />
         </Section>
 
-        <div className="flex items-center justify-end gap-3 pt-2">
+        <div className="sticky bottom-4 z-10 flex items-center justify-end gap-3 rounded-xl border border-border/60 bg-background/75 p-3 shadow-premium backdrop-blur-md">
+          <p className="mr-auto hidden text-xs text-muted-foreground sm:block">
+            Confira os dados antes de confirmar a oferta.
+          </p>
           <Button
             type="button"
             variant="outline"
@@ -490,13 +499,17 @@ export function OfertaForm() {
           >
             Limpar
           </Button>
-          <Button type="submit" disabled={form.formState.isSubmitting}>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={form.formState.isSubmitting}
+          >
             {form.formState.isSubmitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Save className="h-4 w-4" />
             )}
-            Salvar Oferta
+            {form.formState.isSubmitting ? "Salvando..." : "Salvar Oferta"}
           </Button>
         </div>
       </form>
